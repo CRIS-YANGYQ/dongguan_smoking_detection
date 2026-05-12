@@ -121,6 +121,8 @@ docs/**/papers/*.md
 docs/**/datasets.md
 docs/**/modelzoo.md
 
+tests/data/smoking_v1/
+workplace/outputs/
 !tests/data/**/*.pkl
 !tests/data/**/*.pkl.json
 !tests/data/**/*.log.json
