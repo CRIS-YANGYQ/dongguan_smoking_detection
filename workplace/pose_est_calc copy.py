@@ -252,6 +252,39 @@ def visualize_pose_distances(img_path, instances, keypoint_names, inferencer_out
 
 
 
+def load_trained_thresholds(threshold_file: str = None) -> dict:
+    """
+    从训练结果文件加载训练好的阈值
+    
+    Args:
+        threshold_file: 阈值文件路径，如果为None则使用默认路径
+        
+    Returns:
+        dict: 包含训练好的阈值
+    """
+    if threshold_file is None:
+        threshold_file = str(Path(__file__).resolve().parent / "outputs" / "jsons" / "empirical_threshold_summary_nose_shoulder_v2.json")
+    
+    if Path(threshold_file).exists():
+        with open(threshold_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        K_nose_shoulder = data['metrics'].get('nonorm_ratio', {}).get('best_threshold', 1.5)
+        K_nose_shoulder_norm = data['metrics'].get('norm_ratio', {}).get('best_threshold', 2.0)
+        print(f"[INFO]: 已从 {threshold_file} 加载训练阈值")
+        print(f"        K_nose_shoulder = {K_nose_shoulder}")
+        print(f"        K_nose_shoulder_norm = {K_nose_shoulder_norm}")
+    else:
+        print(f"[WARNING]: 未找到阈值文件 {threshold_file}，使用默认值")
+        K_nose_shoulder = 1.5
+        K_nose_shoulder_norm = 2.0
+    
+    return {
+        'K_nose_shoulder': K_nose_shoulder,
+        'K_nose_shoulder_norm': K_nose_shoulder_norm
+    }
+
+
 if __name__ == '__main__':
     test_img_path = "/home/projects/dongguan/Github/mmpose/tests/data/smoking_v1/images/video101_task1_011.jpg"
     # 批量处理模式：同时处理多个目录
@@ -265,8 +298,9 @@ if __name__ == '__main__':
     IS_DIR = True
     timestamp = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
     
-    K_nose_shoulder = 1.5
-    K_nose_shoulder_norm = 2.0
+    thresholds = load_trained_thresholds()
+    K_nose_shoulder = thresholds['K_nose_shoulder']
+    K_nose_shoulder_norm = thresholds['K_nose_shoulder_norm']
     keypoints_score_threshold = 0.4
     min_keypoints = 5
     
