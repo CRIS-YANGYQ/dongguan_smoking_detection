@@ -16,9 +16,14 @@ def find_latest_json_files():
     """查找最新的normal和warning JSON文件"""
     jsons_dir = Path(__file__).parent / "outputs" / "jsons"
     
-    # 查找normal文件
-    normal_files = glob.glob(str(jsons_dir / "pose_metrics_normal_*.json"))
-    warning_files = glob.glob(str(jsons_dir / "pose_metrics_warning_*.json"))
+    # 查找normal文件（支持中文和英文命名）
+    normal_files = glob.glob(str(jsons_dir / "pose_metrics_姿态正常_*.json"))
+    warning_files = glob.glob(str(jsons_dir / "pose_metrics_姿态危险_*.json"))
+    
+    if not normal_files:
+        normal_files = glob.glob(str(jsons_dir / "pose_metrics_normal_*.json"))
+    if not warning_files:
+        warning_files = glob.glob(str(jsons_dir / "pose_metrics_warning_*.json"))
     
     if not normal_files or not warning_files:
         raise ValueError("未找到JSON文件")
@@ -128,18 +133,12 @@ def format_result(result: dict) -> str:
 
 
 if __name__ == '__main__':
-    # 自动查找最新的JSON文件
-    try:
-        normal_json, warning_json = find_latest_json_files()
-        print(f"\n找到最新文件:")
-        print(f"  Normal: {Path(normal_json).name}")
-        print(f"  Warning: {Path(warning_json).name}")
-    except Exception as e:
-        print(f"自动查找失败: {e}")
-        # 如果自动查找失败，使用默认路径
-        normal_json = "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/pose_metrics_normal_2026-05-20_01-07-34.json"
-        warning_json = "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/pose_metrics_warning_2026-05-20_01-07-34.json"
-        print(f"使用默认路径")
+    # 使用与 empirical_smk_thres.py 相同的数据文件
+    normal_json = "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/pose_metrics_姿态正常_2026-05-25_15-09-50.json"
+    warning_json = "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/pose_metrics_姿态危险_2026-05-25_15-12-22.json"
+    print(f"使用指定路径:")
+    print(f"  Normal: {Path(normal_json).name}")
+    print(f"  Warning: {Path(warning_json).name}")
     
     threshold_file = "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/empirical_threshold_summary.json"
     

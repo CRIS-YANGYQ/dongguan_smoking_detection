@@ -148,7 +148,6 @@ def visualize_pose_distances(img_path, instances, keypoint_names, inferencer_out
     instance_records = []
     for person_id, person in enumerate(instances):
         keypoints = person['keypoints']
-        
         # 检查满足阈值要求的关键点个数,如果少于min_keypoints,则跳过该人的吸烟动作检测
         scores = person.get('keypoint_scores', [])
         quealified_keypoints_cnt = sum([1 for score in scores if score > keypoints_score_threshold]) # quealified_keypoints_cnt记录超过keypoints_score_threshold(合格)的关键点数
@@ -179,6 +178,7 @@ def visualize_pose_distances(img_path, instances, keypoint_names, inferencer_out
                 'norm_ratio': None,
                 'skipped': True,
                 'skip_reason': skip_reason,
+                'keypoints': keypoints
             })
             skip_cnt += 1
             continue
@@ -225,6 +225,7 @@ def visualize_pose_distances(img_path, instances, keypoint_names, inferencer_out
             'skipped': False,
             'risk': risk,
             'norm_risk': norm_risk,
+            'keypoints': keypoints
         })
 
         person_text = f'L:{dist_l:.1f}  R:{dist_r:.1f}  L_norm:{norm_dist_l:.3f}  R_norm:{norm_dist_r:.3f}  Anchor:{anchor_nose_ear:.3f}  Anchor_norm:{max_norm_anchor_nose_ear:.3f}  Risk:{risk}  Norm_Risk:{norm_risk}'
@@ -267,12 +268,14 @@ def visualize_pose_distances(img_path, instances, keypoint_names, inferencer_out
 
 if __name__ == '__main__':
     test_img_path = "/home/projects/dongguan/Github/mmpose/tests/data/smoking_v1/images/video101_task1_011.jpg"
-    test_img_dir = "/root/autodl-tmp/projects/dongguan/dataset/classified_test/normal"
+    test_img_dir = "/root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/rgb/姿态危险"
     inferencer_out_dir = 'outputs'
-    vis_output_dir = 'outputs/warning_vis'
+    vis_output_dir = 'outputs/vis/warning'
     json_output_path = 'outputs/jsons/pose_metrics.json'
     IS_DIR = True
     timestamp = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+    print(f"IMG_DIR: {test_img_dir}")
+    print(f"TIMESTAMP: {timestamp}")
     
     if IS_DIR:
         postfix = test_img_dir.split('/')[-1]
@@ -312,8 +315,9 @@ if __name__ == '__main__':
 
     if not IS_DIR:
         results = inferencer(test_img_path, show=False, out_dir=inferencer_out_dir)
-
+        results_len = len(list(results))
         for result in results:
+            
             instances = result['predictions'][0]
 
 
@@ -325,13 +329,15 @@ if __name__ == '__main__':
                 output_dir=vis_output_dir
             )
             json_records['infoes'][Path(test_img_path).name] = frame_record
-            
     else:
-        img_path_lst = [str(Path(test_img_dir) / path) for path in os.listdir(test_img_dir) if path.endswith('.jpg')]
+        img_path_lst = [str(Path(test_img_dir) / path) for path in os.listdir(test_img_dir) if path.endswith('.jpg') or path.endswith('.png')]
         # print(img_path_lst)
-        for img_path in img_path_lst:
+        img_len = len(img_path_lst)
+        print(f"Total images: {img_len}")
+        
+        for img_idx, img_path in enumerate(img_path_lst):
+            print(f"\n[LOG]: Iter IMG {img_idx}/{img_len}")
             results = inferencer(img_path, show=False, out_dir=inferencer_out_dir)
-
             for result in results:
                 instances = result['predictions'][0]
                 
@@ -343,6 +349,9 @@ if __name__ == '__main__':
                     output_dir=vis_output_dir
                 )
                 json_records['infoes'][Path(img_path).name] = frame_record
+                
+                
+        
 
     json_output = Path(json_output_path)
     json_output.parent.mkdir(parents=True, exist_ok=True)

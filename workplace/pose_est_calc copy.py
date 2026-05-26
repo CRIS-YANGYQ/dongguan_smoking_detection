@@ -172,6 +172,7 @@ def visualize_pose_distances(img_path, instances, keypoint_names, inferencer_out
                 'norm_ratio': None,
                 'skipped': True,
                 'skip_reason': skip_reason,
+                'keypoints': keypoints
             })
             skip_cnt += 1
             continue
@@ -214,6 +215,8 @@ def visualize_pose_distances(img_path, instances, keypoint_names, inferencer_out
             'skipped': False,
             'risk': risk,
             'norm_risk': norm_risk,
+            'keypoints': keypoints
+            
         })
 
         person_text = f'L:{dist_l:.1f}  R:{dist_r:.1f}  L_norm:{norm_dist_l:.3f}  R_norm:{norm_dist_r:.3f}  Anchor:{anchor_nose_shoulder:.3f}  Anchor_norm:{norm_anchor_nose_shoulder:.3f}  Risk:{risk}  Norm_Risk:{norm_risk}'
@@ -289,8 +292,8 @@ if __name__ == '__main__':
     test_img_path = "/home/projects/dongguan/Github/mmpose/tests/data/smoking_v1/images/video101_task1_011.jpg"
     # 批量处理模式：同时处理多个目录
     test_img_dirs = [
-        "/root/autodl-tmp/projects/dongguan/dataset/classified_test/normal",
-        "/root/autodl-tmp/projects/dongguan/dataset/classified_test/warning",
+        "/root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/rgb/姿态危险",
+        "/root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/rgb/姿态正常"
     ]
     inferencer_out_dir = 'outputs'
     vis_output_dir = 'outputs/warning_vis'
@@ -338,13 +341,15 @@ if __name__ == '__main__':
             current_json_output_path: str(Path(current_json_output_path).resolve()),
         }
         
-        img_path_lst = [str(Path(test_img_dir) / path) for path in os.listdir(test_img_dir) if path.endswith('.jpg')]
-        for img_path in img_path_lst:
+        img_path_lst = [str(Path(test_img_dir) / path) for path in os.listdir(test_img_dir) if path.endswith('.jpg') or path.endswith('.png')]
+        img_path_lst = sorted(img_path_lst)
+        img_len = len(img_path_lst)
+        for img_idx, img_path in enumerate(img_path_lst):
+            print(f"\n[LOG]: Iter IMG {img_idx}/{img_len}")
             results = inferencer(img_path, show=False, out_dir=inferencer_out_dir)
-            
             for result in results:
-                instances = result['predictions'][0]
                 
+                instances = result['predictions'][0]
                 frame_record = visualize_pose_distances(
                     img_path=img_path,
                     instances=instances,

@@ -521,27 +521,11 @@ def create_detector_from_models(thermal_K_model_path: str = None,
 if __name__ == '__main__':
     np.random.seed(42)
     
+    
     thermal_matrix = np.random.uniform(25.0, 45.0, (1520, 2688, 1)).astype(np.float32)
     
-    mock_keypoints = np.array([
-        [1344, 760, 0.9],
-        [1320, 745, 0.85],
-        [1368, 745, 0.88],
-        [1305, 755, 0.82],
-        [1383, 755, 0.80],
-        [1150, 850, 0.92],
-        [1538, 850, 0.91],
-        [1100, 950, 0.88],
-        [1588, 950, 0.87],
-        [1280, 780, 0.85],
-        [1408, 780, 0.84],
-        [1180, 1100, 0.90],
-        [1508, 1100, 0.89],
-        [1200, 1350, 0.80],
-        [1488, 1350, 0.79],
-        [1220, 1600, 0.75],
-        [1468, 1600, 0.74]
-    ])
+    
+    mock_keypoints = 
     
     detector = SmokingBehaviorDetector(
         K_value=1.5,

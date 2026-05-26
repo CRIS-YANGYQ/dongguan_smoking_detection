@@ -1,13 +1,11 @@
 """
 功能说明
-1. 读取两个由 `pose_est_calc copy.py` 生成的 JSON 文件，分别作为 `normal` 与 `warning` 两类样本。
+1. 读取两个由 `pose_est_calc.py` 生成的 JSON 文件，分别作为 `normal` 与 `warning` 两类样本。
 2. 从 JSON 的 `infoes -> [img_name] -> instances` 中提取未跳过人体实例的指定指标：
    - `nonorm_ratio`
    - `norm_ratio`
 3. 针对每个指标分别搜索单阈值分类规则，使两类样本尽可能分布在阈值两侧，并以分类准确率作为最优标准。
 4. 将最优阈值、分类方向、混淆矩阵、统计信息及样本明细输出到终端，并可保存为汇总 JSON 文件。
-
-注：使用鼻子到双肩中心点距离作为锚点的新版本算法
 
 样本提取逻辑
 - 仅遍历 `infoes` 下每张图片的 `instances`。
@@ -82,7 +80,7 @@
 
 输出位置
 - 输入 JSON：由常量 `NORMAL_JSON` 与 `WARNING_JSON` 指定。
-- 汇总 JSON：`outputs/jsons/empirical_threshold_summary_nose_shoulder_v2.json`
+- 汇总 JSON：`outputs/jsons/empirical_threshold_summary_nose_ear.json`
 - 终端输出：每个指标的最优阈值、准确率、2×2 混淆矩阵和样本统计信息。
 
 运行流程
@@ -99,11 +97,14 @@ from typing import List
 
 
 NORMAL_JSON = Path(
-    "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/pose_metrics_姿态正常_2026-05-25_16-30-25.json"
+    "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/pose_metrics_姿态正常_2026-05-25_15-09-50.json"
 )
 WARNING_JSON = Path(
-    "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/pose_metrics_姿态危险_2026-05-25_16-30-25.json"
+    "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/pose_metrics_姿态危险_2026-05-25_15-12-22.json"
 )
+
+
+
 SAVE_SUMMARY = True
 
 
@@ -306,7 +307,7 @@ def main():
         }
 
     if SAVE_SUMMARY:
-        out_path = Path(__file__).resolve().parent / "outputs" / "jsons" / "empirical_threshold_summary_nose_shoulder_v2.json"
+        out_path = Path(__file__).resolve().parent / "outputs" / "jsons" / "empirical_threshold_summary_nose_ear.json"
         out_path.parent.mkdir(parents=True, exist_ok=True)
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(summary, f, ensure_ascii=False, indent=2)

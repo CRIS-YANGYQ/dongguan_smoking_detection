@@ -80,7 +80,7 @@
 
 输出位置
 - 输入 JSON：由常量 `NORMAL_JSON` 与 `WARNING_JSON` 指定。
-- 汇总 JSON：`outputs/jsons/empirical_threshold_summary.json`
+- 汇总 JSON：`outputs/jsons/empirical_threshold_summary_nose_ear.json`
 - 终端输出：每个指标的最优阈值、准确率、2×2 混淆矩阵和样本统计信息。
 
 运行流程
@@ -97,10 +97,10 @@ from typing import List
 
 
 NORMAL_JSON = Path(
-    "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/pose_metrics_normal_2026-05-12_22-31-43.json"
+    "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/pose_metrics_姿态正常_2026-05-25_15-09-50.json"
 )
 WARNING_JSON = Path(
-    "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/pose_metrics_warning_2026-05-12_22-21-56.json"
+    "/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/outputs/jsons/pose_metrics_姿态危险_2026-05-25_15-12-22.json"
 )
 SAVE_SUMMARY = True
 
@@ -304,7 +304,7 @@ def main():
         }
 
     if SAVE_SUMMARY:
-        out_path = Path(__file__).resolve().parent / "outputs" / "jsons" / "empirical_threshold_summary.json"
+        out_path = Path(__file__).resolve().parent / "outputs" / "jsons" / "empirical_threshold_summary_nose_ear.json"
         out_path.parent.mkdir(parents=True, exist_ok=True)
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(summary, f, ensure_ascii=False, indent=2)

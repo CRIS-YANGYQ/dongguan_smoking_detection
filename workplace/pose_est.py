@@ -1,14 +1,14 @@
-# from mmpose.apis import MMPoseInferencer
+from mmpose.apis import MMPoseInferencer
 
-# img_path = 'tests/data/coco/000000000785.jpg'   # replace this with your own image path
+img_path = 'tests/data/coco/000000000785.jpg'   # replace this with your own image path
 
-# # instantiate the inferencer using the model alias
-# inferencer = MMPoseInferencer('human')
+# instantiate the inferencer using the model alias
+inferencer = MMPoseInferencer('human')
 
-# # The MMPoseInferencer API employs a lazy inference approach,
-# # creating a prediction generator when given input
-# result_generator = inferencer(img_path, show=True)
-# result = next(result_generator)
+# The MMPoseInferencer API employs a lazy inference approach,
+# creating a prediction generator when given input
+result_generator = inferencer(img_path, show=True)
+result = next(result_generator)
 
 # 对于该帧 score > 0.3 的关键点少于 3~5 个就不再检测该人的吸烟动作 
 # keypoints_score_threshold min_keypoints超参进行约束
@@ -30,7 +30,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 # 是上一级目录的mmpose.apis文件
 from mmpose.apis import MMPoseInferencer
-
+# 
 def distance_between_points(p1, p2):
     """计算两点之间的距离"""
     return sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
@@ -145,7 +145,7 @@ def visualize_pose_distances(img_path, instances, keypoint_names, inferencer_out
 
 if __name__ == '__main__':
     test_img_path = "/home/projects/dongguan/Github/mmpose/tests/data/smoking_v1/images/video101_task1_011.jpg"
-    test_img_dir = "/root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/rgb/rgb_20260509_164210/rgb_20260509_164210"
+    test_img_dir = "/root/autodl-tmp/projects/dongguan/dataset/sync_records/test/姿态RGB/正常"
     inferencer_out_dir = 'outputs'
     vis_output_dir = 'outputs/warning_vis'
     IS_DIR = True
