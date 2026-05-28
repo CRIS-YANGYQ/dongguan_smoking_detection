@@ -3,12 +3,10 @@ import numpy as np
 import os
 import glob
 from utils.warp_scale_only_overlay import warp_scale_only_overlay
+from tqdm import tqdm
 
-# rgb_img_path = '/root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/rgb/姿态正常/000045_20260521_112200.png'
-# thermal_img_path = '/root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/thermal/嘴巴附近无热源/000045_20260521_112200.npy'
-
-rgb_img_path = '/root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/rgb/姿态危险/000042_20260521_111425.png'
-thermal_img_path = '/root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/thermal/嘴巴附近无热源/000042_20260521_111425.npy'
+rgb_img_dir = '/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/test/data/rgb/'
+thermal_img_dir = '/root/autodl-tmp/projects/dongguan/Github/mmpose/workplace/test/data/thermal/'
 
 matrices_dir = 'outputs/matrices'
 vis_dir = 'outputs/vis/homography'
@@ -16,10 +14,7 @@ vis_dir = 'outputs/vis/homography'
 os.makedirs(matrices_dir, exist_ok=True)
 os.makedirs(vis_dir, exist_ok=True)
 
-# 提取RGB图片的文件名作为前缀
-rgb_filename = os.path.basename(rgb_img_path).split('.')[0]
-thermal_aligned_save_path = os.path.join(vis_dir, f'{rgb_filename}_thermal_aligned_homography.png')
-thermal_rgb_overlay_save_path = os.path.join(vis_dir, f'{rgb_filename}_thermal_rgb_overlay_homography.png')
+
 
 use_existing_matrix = True
 
@@ -84,18 +79,29 @@ if __name__ == '__main__':
         homography_path = os.path.join(matrices_dir, f'Homography_{timestamp}.npy')
         np.save(homography_path, homography_matrix)
         print(f"Saved Homography matrix to {homography_path}")
+    
+    rgb_img_path_lst = glob.glob(os.path.join(rgb_img_dir, '*.png'))
+    thermal_img_path_lst = glob.glob(os.path.join(thermal_img_dir, '*.npy'))
+    rgb_img_path_lst = sorted(rgb_img_path_lst)
+    thermal_img_path_lst = sorted(thermal_img_path_lst)
+    for rgb_img_path, thermal_img_path in tqdm(zip(rgb_img_path_lst, thermal_img_path_lst), desc="Processing images with Homography"):
 
-    rgb_img = cv2.imread(rgb_img_path)
-    thermal_img = np.load(thermal_img_path)
-    h, w = rgb_img.shape[:2]
+        rgb_img = cv2.imread(rgb_img_path)
+        thermal_img = np.load(thermal_img_path)
+        h, w = rgb_img.shape[:2]
 
-    thermal_aligned = cv2.warpPerspective(thermal_img, homography_matrix, (w, h))
-    if thermal_aligned.dtype != np.uint8:
-        thermal_aligned_vis = cv2.normalize(thermal_aligned, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
-    else:
-        thermal_aligned_vis = thermal_aligned
+        thermal_aligned = cv2.warpPerspective(thermal_img, homography_matrix, (w, h))
+        if thermal_aligned.dtype != np.uint8:
+            thermal_aligned_vis = cv2.normalize(thermal_aligned, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
+        else:
+            thermal_aligned_vis = thermal_aligned
 
-    _, overlay = warp_scale_only_overlay(thermal_aligned, rgb_img, colormap=cv2.COLORMAP_JET, alpha=0.5)
+        _, overlay = warp_scale_only_overlay(thermal_aligned, rgb_img, colormap=cv2.COLORMAP_JET, alpha=0.5)
+        
+        # 提取RGB图片的文件名作为前缀
+        rgb_filename = os.path.basename(rgb_img_path).split('.')[0]
+        thermal_aligned_save_path = os.path.join(vis_dir, f'{rgb_filename}_thermal_aligned_homography.png')
+        thermal_rgb_overlay_save_path = os.path.join(vis_dir, f'{rgb_filename}_thermal_rgb_overlay_homography.png')
 
-    cv2.imwrite(thermal_aligned_save_path, thermal_aligned_vis)
-    cv2.imwrite(thermal_rgb_overlay_save_path, overlay)
+        cv2.imwrite(thermal_aligned_save_path, thermal_aligned_vis)
+        cv2.imwrite(thermal_rgb_overlay_save_path, overlay)

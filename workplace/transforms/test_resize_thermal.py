@@ -213,6 +213,9 @@ def save_case(
 
 
 def main():
+    # /root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/rgb/姿态危险/000092_20260521_112221.png
+    # /root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/rgb/姿态危险/000042_20260521_111425.png
+    # /root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/rgb/姿态正常/000045_20260521_112200.png /root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/thermal/嘴巴附近无热源/000045_20260521_112200.npy
     parser = argparse.ArgumentParser()
     parser.add_argument("--rgb", type=str,
                         default='/root/autodl-tmp/projects/dongguan/dataset/sync_records/pictures/rgb/姿态正常/000045_20260521_112200.png')
@@ -224,7 +227,7 @@ def main():
         "--out-dir",
         type=str,
         default=str(
-            Path(__file__).resolve().parent / "outputs" / "thermal_resize_test"
+            Path(__file__).resolve().parent / "outputs" / "thermal_resize_test" / "000045_20260521_112200"
         ),
     )
     parser.add_argument("--thermal-w", type=int, default=640)
@@ -298,7 +301,7 @@ def main():
                         delta_y=delta_y,
                     )
                     crop_h, crop_w = thermal_crop.shape[:2]
-                    tag = f"w{w_ratio:.2f}_h{h_ratio:.2f}__dx{delta_x:+.0f}_dy{delta_y:+.0f}"
+                    tag = f"w{w_ratio:.2f}_h{h_ratio:.2f}__dx{delta_x:+.1f}_dy{delta_y:+.1f}"
 
                     thermal_resize = cv2.resize(
                         thermal_crop,
